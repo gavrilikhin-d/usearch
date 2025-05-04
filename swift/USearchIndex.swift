@@ -382,6 +382,7 @@ public class USearchIndex: NSObject {
      * @brief Adds a labeled vector to the index.
      * @param vector Half-precision vector.
      */
+    @available(macOS 11.0, iOS 14.0, *)
     public func addHalf(key: USearchKey, vector: UnsafePointer<Float16>) throws {
         try throwing { usearch_add(nativeIndex, key, vector, USearchScalar.f16.toNative(), $0) }
     }
@@ -394,6 +395,7 @@ public class USearchIndex: NSObject {
      * @param distances Optional output buffer for (increasing) distances to approximate neighbors.
      * @return Number of matches exported to `keys` and `distances`.
      */
+    @available(macOS 11.0, iOS 14.0, *)
     public func searchHalf(vector: UnsafePointer<Float16>, count: UInt32, keys: UnsafeMutablePointer<USearchKey>?, distances: UnsafeMutablePointer<Float32>?) throws -> UInt32 {
         let found = try throwing { usearch_search(nativeIndex, vector, USearchScalar.f16.toNative(), Int(count), keys, distances, $0) }
         return UInt32(found)
@@ -405,6 +407,7 @@ public class USearchIndex: NSObject {
     * @param count For multi-indexes, the number of vectors to retrieve.
     * @return Number of vectors exported to `vector`.
     */
+    @available(macOS 11.0, iOS 14.0, *)
     public func getHalf(key: USearchKey, vector: UnsafeMutablePointer<Float16>, count: UInt32) throws -> UInt32 {
         let result = try throwing { usearch_get(nativeIndex, key, Int(count), vector, USearchScalar.f16.toNative(), $0) }
         return UInt32(result)
@@ -420,6 +423,7 @@ public class USearchIndex: NSObject {
      * @param distances Optional output buffer for (increasing) distances to approximate neighbors.
      * @return Number of matches exported to `keys` and `distances`.
      */
+    @available(macOS 11.0, iOS 14.0, *)
     public func filteredSearchHalf(vector: UnsafePointer<Float16>, count: UInt32, filter: @escaping USearchFilterFn, keys: UnsafeMutablePointer<USearchKey>?, distances: UnsafeMutablePointer<Float32>?) throws -> UInt32 {
         return try filteredSearchGeneric(
             nativeIndex,
