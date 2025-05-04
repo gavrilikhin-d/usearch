@@ -378,64 +378,66 @@ public class USearchIndex: NSObject {
         )
     }
 
-    /**
-     * @brief Adds a labeled vector to the index.
-     * @param vector Half-precision vector.
-     */
-    @available(macOS 11.0, iOS 14.0, *)
-    public func addHalf(key: USearchKey, vector: UnsafePointer<Float16>) throws {
-        try throwing { usearch_add(nativeIndex, key, vector, USearchScalar.f16.toNative(), $0) }
-    }
-
-    /**
-     * @brief Approximate nearest neighbors search.
-     * @param vector Half-precision query vector.
-     * @param count Upper limit on the number of matches to retrieve.
-     * @param keys Optional output buffer for keys of approximate neighbors.
-     * @param distances Optional output buffer for (increasing) distances to approximate neighbors.
-     * @return Number of matches exported to `keys` and `distances`.
-     */
-    @available(macOS 11.0, iOS 14.0, *)
-    public func searchHalf(vector: UnsafePointer<Float16>, count: UInt32, keys: UnsafeMutablePointer<USearchKey>?, distances: UnsafeMutablePointer<Float32>?) throws -> UInt32 {
-        let found = try throwing { usearch_search(nativeIndex, vector, USearchScalar.f16.toNative(), Int(count), keys, distances, $0) }
-        return UInt32(found)
-    }
-
-    /**
-    * @brief Retrieves a labeled half-precision vector from the index.
-    * @param vector A buffer to store the vector.
-    * @param count For multi-indexes, the number of vectors to retrieve.
-    * @return Number of vectors exported to `vector`.
-    */
-    @available(macOS 11.0, iOS 14.0, *)
-    public func getHalf(key: USearchKey, vector: UnsafeMutablePointer<Float16>, count: UInt32) throws -> UInt32 {
-        let result = try throwing { usearch_get(nativeIndex, key, Int(count), vector, USearchScalar.f16.toNative(), $0) }
-        return UInt32(result)
-    }
-
-    /**
-     * @brief Approximate nearest neighbors search.
-     * @param vector Double-precision query vector.
-     * @param count Upper limit on the number of matches to retrieve.
-     * @param filter Closure called for each key, determining whether to include or
-     *               skip key in the results.
-     * @param keys Optional output buffer for keys of approximate neighbors.
-     * @param distances Optional output buffer for (increasing) distances to approximate neighbors.
-     * @return Number of matches exported to `keys` and `distances`.
-     */
-    @available(macOS 11.0, iOS 14.0, *)
-    public func filteredSearchHalf(vector: UnsafePointer<Float16>, count: UInt32, filter: @escaping USearchFilterFn, keys: UnsafeMutablePointer<USearchKey>?, distances: UnsafeMutablePointer<Float32>?) throws -> UInt32 {
-        return try filteredSearchGeneric(
-            nativeIndex,
-            vector: vector,
-            count: count,
-            quantization: .f16,
-            filter: filter,
-            keys: keys,
-            distances: distances
-        )
-    }
-
+    #if arch(arm64)
+        /**
+         * @brief Adds a labeled vector to the index.
+         * @param vector Half-precision vector.
+         */
+        @available(macOS 11.0, iOS 14.0, *)
+        public func addHalf(key: USearchKey, vector: UnsafePointer<Float16>) throws {
+            try throwing { usearch_add(nativeIndex, key, vector, USearchScalar.f16.toNative(), $0) }
+        }
+    
+        /**
+         * @brief Approximate nearest neighbors search.
+         * @param vector Half-precision query vector.
+         * @param count Upper limit on the number of matches to retrieve.
+         * @param keys Optional output buffer for keys of approximate neighbors.
+         * @param distances Optional output buffer for (increasing) distances to approximate neighbors.
+         * @return Number of matches exported to `keys` and `distances`.
+         */
+        @available(macOS 11.0, iOS 14.0, *)
+        public func searchHalf(vector: UnsafePointer<Float16>, count: UInt32, keys: UnsafeMutablePointer<USearchKey>?, distances: UnsafeMutablePointer<Float32>?) throws -> UInt32 {
+            let found = try throwing { usearch_search(nativeIndex, vector, USearchScalar.f16.toNative(), Int(count), keys, distances, $0) }
+            return UInt32(found)
+        }
+    
+        /**
+        * @brief Retrieves a labeled half-precision vector from the index.
+        * @param vector A buffer to store the vector.
+        * @param count For multi-indexes, the number of vectors to retrieve.
+        * @return Number of vectors exported to `vector`.
+        */
+        @available(macOS 11.0, iOS 14.0, *)
+        public func getHalf(key: USearchKey, vector: UnsafeMutablePointer<Float16>, count: UInt32) throws -> UInt32 {
+            let result = try throwing { usearch_get(nativeIndex, key, Int(count), vector, USearchScalar.f16.toNative(), $0) }
+            return UInt32(result)
+        }
+    
+        /**
+         * @brief Approximate nearest neighbors search.
+         * @param vector Double-precision query vector.
+         * @param count Upper limit on the number of matches to retrieve.
+         * @param filter Closure called for each key, determining whether to include or
+         *               skip key in the results.
+         * @param keys Optional output buffer for keys of approximate neighbors.
+         * @param distances Optional output buffer for (increasing) distances to approximate neighbors.
+         * @return Number of matches exported to `keys` and `distances`.
+         */
+        @available(macOS 11.0, iOS 14.0, *)
+        public func filteredSearchHalf(vector: UnsafePointer<Float16>, count: UInt32, filter: @escaping USearchFilterFn, keys: UnsafeMutablePointer<USearchKey>?, distances: UnsafeMutablePointer<Float32>?) throws -> UInt32 {
+            return try filteredSearchGeneric(
+                nativeIndex,
+                vector: vector,
+                count: count,
+                quantization: .f16,
+                filter: filter,
+                keys: keys,
+                distances: distances
+            )
+        }
+    #endif
+    
     public func contains(key: USearchKey) throws -> Bool {
         return try throwing { usearch_contains(nativeIndex, key, $0) }
     }
